@@ -1,51 +1,74 @@
 version: '3.8'
 
 services:
-  # PHP Application Service with production optimizations
+  # PHP Application Service
   app:
     build:
       context: ./docker/php
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
+    container_name: laravel_app_prod
     restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./src:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laravel_network
+    depends_on:
+      - mysql
+      - redis
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-    volumes:
-      - ./src:/var/www
-      - ./docker/php/production.ini:/usr/local/etc/php/conf.d/local.ini
 
-  # Nginx Service with production configuration
+  # Nginx Service
   nginx:
     build:
       context: ./docker/nginx
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
+    container_name: laravel_nginx_prod
     restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
     volumes:
       - ./src:/var/www
-      - ./docker/nginx/production.conf:/etc/nginx/conf.d/app.conf
-      - ./ssl:/etc/nginx/ssl
-      - ./logs/nginx:/var/log/nginx
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    networks:
+      - laravel_network
+    depends_on:
+      - app
 
-  # MySQL Service with production settings
+  # MySQL Service
   mysql:
+    image: mysql:8.0
+    container_name: laravel_mysql_prod
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel_starter}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root_password}
+      MYSQL_USER: ${DB_USERNAME:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-}
+    ports:
+      - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/production.cnf:/etc/mysql/conf.d/my.cnf
-      - ./logs/mysql:/var/log/mysql
-      - ./backups:/backups
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - laravel_network
 
-  # Redis Service with persistence
+  # Redis Service
   redis:
+    image: redis:7-alpine
+    container_name: laravel_redis_prod
     restart: unless-stopped
+    ports:
+      - '6379:6379'
     volumes:
       - redis_data:/data
-      - ./logs/redis:/var/log/redis
+    networks:
+      - laravel_network
 
 volumes:
   mysql_data:
@@ -55,4 +78,4 @@ volumes:
 
 networks:
   laravel_network:
-    driver: bridge 
+    driver: bridge
