@@ -1,44 +1,41 @@
 services:
   - type: web
-    name: laravel-dockerized-starter
+    name: laravel-app
     env: docker
     plan: free
-    buildCommand: docker build -t laravel-app .
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
-      - key: DB_CONNECTION
-        value: mysql
-      - key: DB_HOST
-        value: b18cflhygrkdqv1bl0e9-mysql.services.clever-cloud.com
-      - key: DB_PORT
-        value: 3306
-      - key: DB_DATABASE
-        value: b18cflhygrkdqv1bl0e9
-      - key: DB_USERNAME
-        value: uw6mh9qibng0cfp4
-      - key: DB_PASSWORD
-        value: Ks6hRUxDDfQ6WD9GyqRC
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_URL
         value: https://laravel-dockerized-starter.onrender.com
-      - key: REDIS_HOST
-        value: 127.0.0.1
-      - key: REDIS_PORT
-        value: 6379
-      - key: MAIL_MAILER
-        value: smtp
+      - key: CACHE_DRIVER
+        value: file
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      - key: DB_USERNAME
+        sync: false
       - key: MAIL_HOST
         value: mailhog
+      - key: MAIL_MAILER
+        value: smtp
       - key: MAIL_PORT
         value: 1025
-      - key: CACHE_DRIVER
-        value: redis
-      - key: SESSION_DRIVER
-        value: redis
       - key: QUEUE_CONNECTION
-        value: redis
+        value: sync
+      - key: SESSION_DRIVER
+        value: file
 
   - type: redis
     name: redis-cache
