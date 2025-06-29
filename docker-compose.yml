@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PHP Application Service
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./src:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laravel_network
+    depends_on:
+      - mysql
+      - redis
+
+  # Nginx Service
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    networks:
+      - laravel_network
+    depends_on:
+      - app
+
+  # MySQL Service
+  mysql:
+    image: mysql:8.0
+    container_name: laravel_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: laravel_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - laravel_network
+
+  # Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: laravel_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - laravel_network
+
+  # MailHog for Email Testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: laravel_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - laravel_network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  laravel_network:
+    driver: bridge 
