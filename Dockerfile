@@ -38,6 +38,24 @@ RUN mkdir -p /var/www/bootstrap/cache \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
+# Create production .env file
+RUN cp .env.example .env && \
+    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env && \
+    sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=file/' .env && \
+    sed -i 's/CACHE_STORE=database/CACHE_STORE=file/' .env && \
+    sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=sync/' .env && \
+    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env && \
+    sed -i 's/APP_ENV=local/APP_ENV=production/' .env
+
+# Generate application key
+RUN php artisan key:generate --no-interaction
+
+# Create SQLite database
+RUN touch database/database.sqlite
+
+# Run migrations
+RUN php artisan migrate --force
+
 # Set final permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
