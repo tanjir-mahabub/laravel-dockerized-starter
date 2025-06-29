@@ -57,20 +57,23 @@ COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 # Copy Nginx configuration
 COPY docker/nginx/conf.d/app.conf /etc/nginx/sites-available/default
 
-# Create startup script that sets environment variables
+# Create startup script that maps Clever Cloud env vars to Laravel DB vars
 RUN echo '#!/bin/bash\n\
-# Update .env file with environment variables\n\
-if [ ! -z "$DB_HOST" ]; then\n\
-    sed -i "s/DB_HOST=.*/DB_HOST=$DB_HOST/" /var/www/.env\n\
+# Map Clever Cloud environment variables to Laravel database variables\n\
+if [ ! -z "$MYSQL_ADDON_HOST" ]; then\n\
+    sed -i "s/DB_HOST=.*/DB_HOST=$MYSQL_ADDON_HOST/" /var/www/.env\n\
 fi\n\
-if [ ! -z "$DB_DATABASE" ]; then\n\
-    sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_DATABASE/" /var/www/.env\n\
+if [ ! -z "$MYSQL_ADDON_DB" ]; then\n\
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=$MYSQL_ADDON_DB/" /var/www/.env\n\
 fi\n\
-if [ ! -z "$DB_USERNAME" ]; then\n\
-    sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USERNAME/" /var/www/.env\n\
+if [ ! -z "$MYSQL_ADDON_USER" ]; then\n\
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=$MYSQL_ADDON_USER/" /var/www/.env\n\
 fi\n\
-if [ ! -z "$DB_PASSWORD" ]; then\n\
-    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASSWORD/" /var/www/.env\n\
+if [ ! -z "$MYSQL_ADDON_PASSWORD" ]; then\n\
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$MYSQL_ADDON_PASSWORD/" /var/www/.env\n\
+fi\n\
+if [ ! -z "$MYSQL_ADDON_PORT" ]; then\n\
+    sed -i "s/DB_PORT=.*/DB_PORT=$MYSQL_ADDON_PORT/" /var/www/.env\n\
 fi\n\
 # Debug: show the processed .env file\n\
 echo "=== Database configuration ==="\n\
