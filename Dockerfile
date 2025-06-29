@@ -41,7 +41,13 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Create production .env file
 RUN cp .env.example .env && \
     sed -i 's/APP_ENV=local/APP_ENV=production/' .env && \
-    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env
+    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env && \
+    sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env && \
+    sed -i 's/DB_HOST=.*/DB_HOST=b18cflhygrkdqv1bl0e9-mysql.services.clever-cloud.com/' .env && \
+    sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env && \
+    sed -i 's/DB_DATABASE=.*/DB_DATABASE=b18cflhygrkdqv1bl0e9/' .env && \
+    sed -i 's/DB_USERNAME=.*/DB_USERNAME=uw6mh9qibng0cfp4/' .env && \
+    sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=Ks6hRUxDDfQ6WD9GyqRC/' .env
 
 # Generate application key
 RUN php artisan key:generate --no-interaction
