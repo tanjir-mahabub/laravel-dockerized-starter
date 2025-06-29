@@ -38,14 +38,10 @@ RUN mkdir -p /var/www/bootstrap/cache \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Create production .env file with environment variable placeholders
+# Create production .env file
 RUN cp .env.example .env && \
     sed -i 's/APP_ENV=local/APP_ENV=production/' .env && \
-    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env && \
-    sed -i 's/DB_HOST=127.0.0.1/DB_HOST=${DB_HOST:-mysql}/' .env && \
-    sed -i 's/DB_DATABASE=laravel_starter/DB_DATABASE=${DB_DATABASE:-laravel}/' .env && \
-    sed -i 's/DB_USERNAME=root/DB_USERNAME=${DB_USERNAME:-root}/' .env && \
-    sed -i 's/DB_PASSWORD=/DB_PASSWORD=${DB_PASSWORD:-}/' .env
+    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env
 
 # Generate application key
 RUN php artisan key:generate --no-interaction
@@ -61,10 +57,25 @@ COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 # Copy Nginx configuration
 COPY docker/nginx/conf.d/app.conf /etc/nginx/sites-available/default
 
-# Create startup script that processes environment variables
+# Create startup script that sets environment variables
 RUN echo '#!/bin/bash\n\
-# Process environment variables in .env file\n\
-envsubst < /var/www/.env > /var/www/.env.tmp && mv /var/www/.env.tmp /var/www/.env\n\
+# Update .env file with environment variables\n\
+if [ ! -z "$DB_HOST" ]; then\n\
+    sed -i "s/DB_HOST=.*/DB_HOST=$DB_HOST/" /var/www/.env\n\
+fi\n\
+if [ ! -z "$DB_DATABASE" ]; then\n\
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_DATABASE/" /var/www/.env\n\
+fi\n\
+if [ ! -z "$DB_USERNAME" ]; then\n\
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USERNAME/" /var/www/.env\n\
+fi\n\
+if [ ! -z "$DB_PASSWORD" ]; then\n\
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASSWORD/" /var/www/.env\n\
+fi\n\
+# Debug: show the processed .env file\n\
+echo "=== Database configuration ==="\n\
+grep "DB_" /var/www/.env\n\
+echo "============================="\n\
 php-fpm -D\n\
 nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
 
