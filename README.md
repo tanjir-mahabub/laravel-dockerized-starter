@@ -28,10 +28,12 @@ A complete Docker development environment for Laravel 12 with PHP 8.4, MySQL 8.0
 cd laravel-dockerized-starter
 
 # Build and start all containers
+# If you have make installed:
 make setup
+# Or follow the manual steps below
 ```
 
-### 2. Alternative Manual Setup
+### 2. Manual Setup (If Make is not available)
 
 ```bash
 # Build Docker images
@@ -39,12 +41,22 @@ docker-compose build
 
 # Start containers
 docker-compose up -d
+```
 
-# Install Laravel dependencies
-docker-compose exec app composer install
+#### If you see errors about missing Laravel files in src/ (e.g., 'Could not open input file: artisan'):
 
-# Copy environment file
-docker-compose exec app cp env.example .env
+##### Install Laravel manually in the src directory:
+
+```bash
+# Make sure src/ is empty before running this!
+docker-compose exec app composer create-project laravel/laravel .
+```
+
+### 3. Laravel Setup
+
+```bash
+# Copy environment file (if not already present)
+docker-compose exec app cp .env.example .env
 
 # Generate application key
 docker-compose exec app php artisan key:generate
@@ -59,6 +71,25 @@ docker-compose exec app php artisan migrate
 - **MailHog (Email Testing)**: http://localhost:8025
 - **MySQL**: localhost:3306
 - **Redis**: localhost:6379
+
+## 🗄️ Database Configuration
+
+By default, the project uses **MySQL** for development and testing. The relevant .env section is:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel_starter
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+If you want to use SQLite for quick tests, change the above to:
+
+```env
+DB_CONNECTION=sqlite
+```
 
 ## 📁 Project Structure
 
@@ -281,14 +312,41 @@ make setup
 - [Nginx Configuration](https://nginx.org/en/docs/)
 - [MySQL Documentation](https://dev.mysql.com/doc/)
 
-```bash
-make clean-all
-make setup
-```
+## 🧪 Verifying the Project is Working
 
-## 📚 Additional Resources
+1. **Check containers:**
 
-- [Laravel Documentation](https://laravel.com/docs)
-- [Docker Documentation](https://docs.docker.com/)
-- [Nginx Configuration](https://nginx.org/en/docs/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
+   ```bash
+   docker-compose ps
+   ```
+
+   All services should show `Up`.
+
+2. **Browser test:**
+   Open [http://localhost](http://localhost) — you should see the Laravel welcome page.
+
+3. **Artisan test:**
+
+   ```bash
+   docker-compose exec app php artisan --version
+   ```
+
+   You should see the Laravel version (e.g., `Laravel Framework 12.19.3`).
+
+4. **MailHog:**
+   Open [http://localhost:8025](http://localhost:8025) to view test emails.
+
+## 🛠️ Troubleshooting
+
+- **Nginx container keeps restarting with error:**
+  ```
+  invalid value "must-revalidate" in /etc/nginx/conf.d/app.conf:19
+  ```
+  **Solution:** Edit `docker/nginx/conf.d/app.conf` and remove `must-revalidate` from the `gzip_proxied` line. It should look like:
+  ```nginx
+  gzip_proxied expired no-cache no-store private auth;
+  ```
+  Then restart nginx:
+  ```bash
+  docker-compose restart nginx
+  ```
