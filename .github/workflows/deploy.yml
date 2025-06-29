@@ -88,14 +88,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # For Railway deployment
-      - name: Deploy to Railway
-        uses: railway/deploy@v1
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE }}
-
-    # Alternative: For Render deployment
-    # - name: Deploy to Render
-    #   run: |
-    #     curl -X POST "https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}"
+      - name: Deploy to Render
+        run: |
+          curl -X POST "https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}"
