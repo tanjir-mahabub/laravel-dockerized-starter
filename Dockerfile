@@ -41,13 +41,8 @@ RUN mkdir -p /var/www/storage/logs \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Create production .env file with default values
-RUN cp .env.example .env && \
-    sed -i 's/APP_ENV=local/APP_ENV=production/' .env && \
-    sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env
-
-# Generate application key
-RUN php artisan key:generate --no-interaction
+# Create production .env file with default values (keep as local for build)
+RUN cp .env.example .env
 
 # Set final permissions
 RUN chown -R www-data:www-data /var/www \
@@ -60,8 +55,17 @@ COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 # Copy Nginx configuration
 COPY docker/nginx/conf.d/app.conf /etc/nginx/sites-available/default
 
-# Create startup script that sets environment variables
+# Create startup script that sets environment variables and generates key
 RUN echo '#!/bin/bash\n\
+# Set production environment\n\
+sed -i "s/APP_ENV=local/APP_ENV=production/" /var/www/.env\n\
+sed -i "s/APP_DEBUG=true/APP_DEBUG=false/" /var/www/.env\n\
+\n\
+# Generate application key if not set\n\
+if ! grep -q "APP_KEY=base64:" /var/www/.env; then\n\
+    php artisan key:generate --no-interaction\n\
+fi\n\
+\n\
 # Update .env file with environment variables\n\
 if [ ! -z "$DB_HOST" ]; then\n\
     sed -i "s/DB_HOST=.*/DB_HOST=$DB_HOST/" /var/www/.env\n\
@@ -78,10 +82,17 @@ fi\n\
 if [ ! -z "$DB_PORT" ]; then\n\
     sed -i "s/DB_PORT=.*/DB_PORT=$DB_PORT/" /var/www/.env\n\
 fi\n\
+if [ ! -z "$APP_KEY" ]; then\n\
+    sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" /var/www/.env\n\
+fi\n\
+\n\
 # Debug: show the processed .env file\n\
 echo "=== Database configuration ==="\n\
 grep "DB_" /var/www/.env\n\
+echo "=== App configuration ==="\n\
+grep "APP_" /var/www/.env\n\
 echo "============================="\n\
+\n\
 php-fpm -D\n\
 nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
 
