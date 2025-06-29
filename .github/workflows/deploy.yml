@@ -47,16 +47,22 @@ jobs:
       - name: Copy .env
         run: cp src/.env.example src/.env
 
+      - name: Ensure bootstrap/cache exists and is writable
+        run: |
+          mkdir -p bootstrap/cache
+          chmod -R 777 bootstrap/cache
+        working-directory: ./src
+
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         working-directory: ./src
 
-      - name: Generate key
-        run: php artisan key:generate
-        working-directory: ./src
-
       - name: Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
+        working-directory: ./src
+
+      - name: Generate key
+        run: php artisan key:generate
         working-directory: ./src
 
       - name: Create Database
