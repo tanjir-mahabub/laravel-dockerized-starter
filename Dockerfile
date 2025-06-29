@@ -25,15 +25,16 @@ WORKDIR /var/www
 # Copy application files
 COPY src/ .
 
-# Create necessary directories and set permissions
+# Create necessary directories and set permissions BEFORE composer install
 RUN mkdir -p /var/www/bootstrap/cache \
     && mkdir -p /var/www/storage/logs \
     && mkdir -p /var/www/storage/framework/cache \
     && mkdir -p /var/www/storage/framework/sessions \
     && mkdir -p /var/www/storage/framework/views \
+    && mkdir -p src/bootstrap/cache \
     && chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts
@@ -49,7 +50,7 @@ RUN php artisan key:generate --no-interaction
 # Set final permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Copy custom PHP configuration
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
