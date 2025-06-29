@@ -106,7 +106,9 @@ laravel-dockerized-starter/
 │   └── mysql/
 │       └── my.cnf
 ├── src/
-│   └── env.example
+│   ├── .env
+│   ├── .env.example
+│   └── [Laravel application files]
 ├── docker-compose.yml
 ├── Makefile
 └── README.md
@@ -156,20 +158,23 @@ make composer ARGS="dump-autoload"
 
 ### Environment Variables
 
-The main configuration is in `src/env.example`. Copy it to `src/.env` and customize:
+The main configuration is in `src/.env.example`. Copy it to `src/.env` and customize:
 
-```bash
+```env
 # Database
+DB_CONNECTION=mysql
 DB_HOST=mysql
-DB_DATABASE=laravel
-DB_USERNAME=laravel_user
-DB_PASSWORD=laravel_password
+DB_PORT=3306
+DB_DATABASE=laravel_starter
+DB_USERNAME=root
+DB_PASSWORD=
 
 # Redis
 REDIS_HOST=redis
 REDIS_PORT=6379
 
 # Mail
+MAIL_MAILER=smtp
 MAIL_HOST=mailhog
 MAIL_PORT=1025
 ```
@@ -182,6 +187,7 @@ PHP settings are configured in `docker/php/local.ini`:
 - Upload max filesize: 40M
 - Max execution time: 600s
 - Error reporting: E_ALL
+- Date timezone: UTC
 
 ### MySQL Configuration
 
@@ -339,14 +345,32 @@ make setup
 ## 🛠️ Troubleshooting
 
 - **Nginx container keeps restarting with error:**
+
   ```
   invalid value "must-revalidate" in /etc/nginx/conf.d/app.conf:19
   ```
+
   **Solution:** Edit `docker/nginx/conf.d/app.conf` and remove `must-revalidate` from the `gzip_proxied` line. It should look like:
+
   ```nginx
   gzip_proxied expired no-cache no-store private auth;
   ```
+
   Then restart nginx:
+
   ```bash
   docker-compose restart nginx
+  ```
+
+- **PHP date.timezone warning:**
+  ```
+  PHP Warning: Invalid date.timezone value 'UTC ', using 'UTC' instead
+  ```
+  **Solution:** Edit `docker/php/local.ini` and remove the trailing space after `UTC`:
+  ```ini
+  date.timezone=UTC
+  ```
+  Then restart the app container:
+  ```bash
+  docker-compose restart app
   ```
