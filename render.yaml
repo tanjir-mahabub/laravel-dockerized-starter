@@ -6,18 +6,18 @@ services:
     buildCommand: docker build -t laravel-app .
     startCommand: docker run -p $PORT:80 laravel-app
     envVars:
-      - key: MYSQL_ADDON_HOST
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
         value: b18cflhygrkdqv1bl0e9-mysql.services.clever-cloud.com
-      - key: MYSQL_ADDON_DB
-        value: b18cflhygrkdqv1bl0e9
-      - key: MYSQL_ADDON_USER
-        value: uw6mh9qibng0cfp4
-      - key: MYSQL_ADDON_PORT
+      - key: DB_PORT
         value: 3306
-      - key: MYSQL_ADDON_PASSWORD
+      - key: DB_DATABASE
+        value: b18cflhygrkdqv1bl0e9
+      - key: DB_USERNAME
+        value: uw6mh9qibng0cfp4
+      - key: DB_PASSWORD
         value: Ks6hRUxDDfQ6WD9GyqRC
-      - key: MYSQL_ADDON_URI
-        value: mysql://uw6mh9qibng0cfp4:Ks6hRUxDDfQ6WD9GyqRC@b18cflhygrkdqv1bl0e9-mysql.services.clever-cloud.com:3306/b18cflhygrkdqv1bl0e9
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
