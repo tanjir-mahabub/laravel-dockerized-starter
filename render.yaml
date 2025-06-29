@@ -12,6 +12,8 @@ services:
         value: false
       - key: APP_URL
         value: https://laravel-dockerized-starter.onrender.com
+      - key: APP_KEY
+        sync: false
       - key: CACHE_DRIVER
         value: file
       - key: DB_CONNECTION
@@ -26,6 +28,10 @@ services:
         value: 3306
       - key: DB_USERNAME
         sync: false
+      - key: REDIS_HOST
+        value: redis-cache
+      - key: REDIS_PORT
+        value: 6379
       - key: MAIL_HOST
         value: mailhog
       - key: MAIL_MAILER
