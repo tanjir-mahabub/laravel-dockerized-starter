@@ -1,29 +1,31 @@
 services:
   - type: web
-    name: laravel-app
+    name: laravel-dockerized-starter
     env: docker
     plan: free
     buildCommand: docker build -t laravel-app .
     startCommand: docker run -p $PORT:80 laravel-app
     envVars:
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: b18cflhygrkdqv1bl0e9-mysql.services.clever-cloud.com
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: b18cflhygrkdqv1bl0e9
+      - key: DB_USERNAME
+        value: uw6mh9qibng0cfp4
+      - key: DB_PASSWORD
+        value: Ks6hRUxDDfQ6WD9GyqRC
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_URL
-        value: https://laravel-app.onrender.com
-      - key: DB_CONNECTION
-        value: mysql
-      - key: DB_HOST
-        value: mysql
-      - key: DB_PORT
-        value: 3306
-      - key: DB_DATABASE
-        value: laravel_starter
-      - key: DB_USERNAME
-        value: root
+        value: https://laravel-dockerized-starter.onrender.com
       - key: REDIS_HOST
-        value: redis
+        value: 127.0.0.1
       - key: REDIS_PORT
         value: 6379
       - key: MAIL_MAILER
