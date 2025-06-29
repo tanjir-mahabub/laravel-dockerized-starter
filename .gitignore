@@ -1,41 +1,45 @@
-# Laravel
-/src/.env
-/src/vendor/
-/src/node_modules/
-/src/public/hot
-/src/public/storage
-/src/storage/*.key
-/src/storage/logs/
-/src/storage/framework/cache/
-/src/storage/framework/sessions/
-/src/storage/framework/views/
-/src/bootstrap/cache/
+# Laravel Dockerized Starter Template - .gitignore
 
-# Composer
-/src/composer.phar
-/src/composer.lock
+# Laravel specific
+src/node_modules/
+src/npm-debug.log
+src/yarn-error.log
+src/.env
+src/.env.backup
+src/.env.production
+src/.phpunit.result.cache
+src/homestead.json
+src/homestead.yaml
+src/auth.json
+src/npm-debug.log
+src/yarn-error.log
+src/.fleet
+src/.idea
 
-# NPM
-/src/package-lock.json
-/src/yarn.lock
+# Laravel storage and cache
+src/storage/*.key
+src/storage/logs/*.log
+src/storage/framework/cache/*
+src/storage/framework/sessions/*
+src/storage/framework/views/*
+src/storage/app/public/*
+src/bootstrap/cache/*.php
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
+# Keep .gitkeep files
+!src/storage/logs/.gitkeep
+!src/storage/framework/cache/.gitkeep
+!src/storage/framework/sessions/.gitkeep
+!src/storage/framework/views/.gitkeep
+!src/storage/app/public/.gitkeep
+!src/bootstrap/cache/.gitkeep
 
 # Docker
 .dockerignore
+docker-compose.override.yml
 
 # Logs
-*.log
 logs/
+*.log
 
 # Runtime data
 pids
@@ -45,15 +49,44 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # nyc test coverage
 .nyc_output
 
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
 # Dependency directories
 node_modules/
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+
+# TypeScript cache
+*.tsbuildinfo
 
 # Optional npm cache directory
 .npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
 # Optional REPL history
 .node_repl_history
@@ -68,35 +101,49 @@ node_modules/
 .env
 .env.test
 .env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
 
-# next.js build output
+# Next.js build output
 .next
 
-# nuxt.js build output
+# Nuxt.js build / generate output
 .nuxt
+dist
 
-# vuepress build output
-.vuepress/dist
+# Gatsby files
+.cache/
+public
 
-# Serverless directories
-.serverless
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
+# Storybook build outputs
+.out
+.storybook-out
 
 # Temporary folders
 tmp/
-temp/ 
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+# Add any project-specific files to ignore here 

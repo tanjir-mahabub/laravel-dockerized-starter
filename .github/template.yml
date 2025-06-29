@@ -1,0 +1,15 @@
+name: Laravel Dockerized Starter Template
+description: A production-ready Laravel starter template with Docker, Nginx, MySQL, Redis, and automated deployment to Render.
+visibility: public
+topics:
+  - laravel
+  - docker
+  - nginx
+  - mysql
+  - redis
+  - render
+  - deployment
+  - template
+  - starter
+  - php
+  - web-development

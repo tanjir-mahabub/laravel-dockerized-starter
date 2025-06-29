@@ -1,286 +1,241 @@
-# Laravel 12 Docker Environment
+# 🚀 Laravel Dockerized Starter Template
 
-A complete Docker development environment for Laravel 12 with PHP 8.4, MySQL 8.0, Redis, and Nginx.
+A production-ready Laravel starter template with Docker, Nginx, MySQL, Redis, and automated deployment to Render.
 
-## 🚀 Features
+## ✨ Features
 
-- **PHP 8.4** with FPM
-- **MySQL 8.0** with optimized configuration
-- **Redis 7** for caching and sessions
-- **Nginx** with optimized Laravel configuration
-- **MailHog** for email testing
-- **Node.js 20** and **Yarn** for frontend assets
-- **Composer** for PHP dependencies
-- **Makefile** for easy command execution
+- **🐳 Dockerized Development**: Complete Docker setup with PHP 8.4, Nginx, MySQL 8.0, Redis, and MailHog
+- **🚀 Production Ready**: Optimized for deployment on Render with single-container setup
+- **🔧 Development Tools**: Includes phpMyAdmin, Redis Commander, and MailHog for local development
+- **⚡ CI/CD Ready**: GitHub Actions workflow for automated deployment
+- **🔒 Security**: Proper environment variable handling and security headers
+- **📱 Modern Stack**: Laravel 11, PHP 8.4, MySQL 8.0, Redis 7
 
-## 📋 Prerequisites
+## 🚀 Quick Start
 
-- Docker
-- Docker Compose
-- Make (optional, but recommended)
+### Prerequisites
 
-## 🛠️ Quick Start
+- Docker and Docker Compose
+- Git
 
-### 1. Clone and Setup
+### 1. Create New Project
 
 ```bash
-# Clone your project or navigate to the project directory
-cd laravel-dockerized-starter
-
-# Build and start all containers
-# If you have make installed:
-make setup
-# Or follow the manual steps below
+# Use this template to create a new repository
+# Then clone your new repository
+git clone <your-repo-url>
+cd <your-project-name>
 ```
 
-### 2. Manual Setup (If Make is not available)
+### 2. Start Development Environment
 
 ```bash
-# Build Docker images
-docker-compose build
-
-# Start containers
+# Start all services
 docker-compose up -d
+
+# Or use the development configuration
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
-#### If you see errors about missing Laravel files in src/ (e.g., 'Could not open input file: artisan'):
-
-##### Install Laravel manually in the src directory:
+### 3. Install Laravel Dependencies
 
 ```bash
-# Make sure src/ is empty before running this!
-docker-compose exec app composer create-project laravel/laravel .
-```
+# Enter the PHP container
+docker-compose exec app bash
 
-### 3. Laravel Setup
-
-```bash
-# Copy environment file (if not already present)
-docker-compose exec app cp .env.example .env
+# Install dependencies
+composer install
 
 # Generate application key
-docker-compose exec app php artisan key:generate
+php artisan key:generate
 
 # Run migrations
-docker-compose exec app php artisan migrate
+php artisan migrate
+
+# Exit container
+exit
 ```
 
-## 🌐 Access Points
+### 4. Access Your Application
 
-- **Laravel Application**: http://localhost
-- **MailHog (Email Testing)**: http://localhost:8025
-- **MySQL**: localhost:3306
-- **Redis**: localhost:6379
+- **Laravel App**: http://localhost
+- **phpMyAdmin**: http://localhost:8080
+- **Redis Commander**: http://localhost:8081
+- **MailHog**: http://localhost:8025
 
-## 🗄️ Database Configuration
-
-By default, the project uses **MySQL** for development and testing. The relevant .env section is:
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=laravel_starter
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-If you want to use SQLite for quick tests, change the above to:
-
-```env
-DB_CONNECTION=sqlite
-```
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 laravel-dockerized-starter/
-├── docker/
-│   ├── nginx/
-│   │   ├── Dockerfile
-│   │   └── conf.d/
-│   │       └── app.conf
-│   ├── php/
-│   │   ├── Dockerfile
-│   │   └── local.ini
-│   └── mysql/
-│       └── my.cnf
-├── src/
-│   ├── .env
-│   ├── .env.example
-│   └── [Laravel application files]
-├── docker-compose.yml
-├── Makefile
-└── README.md
+├── docker/                    # Docker configurations
+│   ├── mysql/                # MySQL configuration
+│   ├── nginx/                # Nginx configuration
+│   └── php/                  # PHP configuration
+├── src/                      # Laravel application
+├── docker-compose.yml        # Main Docker Compose
+├── docker-compose.dev.yml    # Development configuration
+├── docker-compose.prod.yml   # Production configuration
+├── Dockerfile               # Production Dockerfile
+├── render.yaml              # Render deployment config
+└── .github/                 # GitHub Actions workflows
 ```
 
-## 🎯 Available Commands
+## 🐳 Docker Services
 
-### Docker Management
+| Service             | Port      | Description         |
+| ------------------- | --------- | ------------------- |
+| **app**             | 9000      | PHP-FPM Application |
+| **nginx**           | 80        | Web Server          |
+| **mysql**           | 3306      | Database            |
+| **redis**           | 6379      | Cache/Session Store |
+| **mailhog**         | 1025/8025 | Email Testing       |
+| **phpmyadmin**      | 8080      | Database Management |
+| **redis-commander** | 8081      | Redis Management    |
 
-```bash
-make build          # Build Docker images
-make up             # Start containers
-make down           # Stop containers
-make restart        # Restart containers
-make logs           # Show container logs
-make shell          # Access PHP container shell
-```
+## 🚀 Deployment
 
-### Laravel Development
+### Render Deployment
 
-```bash
-make install        # Install Composer dependencies
-make update         # Update Composer dependencies
-make test           # Run Laravel tests
-make migrate        # Run database migrations
-make seed           # Run database seeders
-make fresh          # Fresh database with seeders
-```
+1. **Connect Repository**: Link your GitHub repository to Render
+2. **Environment Variables**: Set the following in Render dashboard:
 
-### Artisan Commands
+   ```
+   DB_HOST=your-mysql-host
+   DB_DATABASE=your-database-name
+   DB_USERNAME=your-username
+   DB_PASSWORD=your-password
+   DB_PORT=3306
+   APP_KEY=base64:your-generated-key
+   ```
 
-```bash
-make artisan ARGS="make:controller UserController"
-make artisan ARGS="make:model User -m"
-make artisan ARGS="route:list"
-```
+3. **Deploy**: Render will automatically deploy using the `Dockerfile` and `render.yaml`
 
-### Composer Commands
+### GitHub Actions (Alternative)
 
-```bash
-make composer ARGS="require package/name"
-make composer ARGS="update"
-make composer ARGS="dump-autoload"
-```
+The template includes a GitHub Actions workflow for automated deployment. Set these secrets:
+
+- `RENDER_SERVICE_ID`: Your Render service ID
+- `RENDER_API_KEY`: Your Render API key
 
 ## 🔧 Configuration
 
 ### Environment Variables
 
-The main configuration is in `src/.env.example`. Copy it to `src/.env` and customize:
+Create `.env` files for different environments:
 
-```env
-# Database
+#### Local Development
+
+```bash
+# Copy example file
+cp src/.env.example src/.env
+
+# Update with local settings
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=laravel_starter
-DB_USERNAME=root
-DB_PASSWORD=
-
-# Redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-
-# Mail
-MAIL_MAILER=smtp
-MAIL_HOST=mailhog
-MAIL_PORT=1025
+DB_DATABASE=laravel
+DB_USERNAME=laravel_user
+DB_PASSWORD=laravel_password
 ```
 
-### PHP Configuration
+#### Production
 
-PHP settings are configured in `docker/php/local.ini`:
-
-- Memory limit: 512M
-- Upload max filesize: 40M
-- Max execution time: 600s
-- Error reporting: E_ALL
-- Date timezone: UTC
-
-### MySQL Configuration
-
-MySQL settings are in `docker/mysql/my.cnf`:
-
-- Character set: utf8mb4
-- InnoDB buffer pool: 256M
-- Query cache: 32M
-- Slow query logging enabled
-
-### Nginx Configuration
-
-Nginx configuration is in `docker/nginx/conf.d/app.conf`:
-
-- Gzip compression enabled
-- Security headers configured
-- Static file caching
-- Laravel routing support
-
-## 🧪 Testing
-
-### Run Tests
+Set these in your deployment platform (Render):
 
 ```bash
-make test
+APP_ENV=production
+APP_DEBUG=false
+DB_HOST=your-production-host
+DB_DATABASE=your-production-database
+DB_USERNAME=your-production-username
+DB_PASSWORD=your-production-password
 ```
 
-### Run Specific Test
+### Database Setup
 
 ```bash
-make artisan ARGS="test --filter=UserTest"
+# Run migrations
+docker-compose exec app php artisan migrate
+
+# Seed database (if seeders exist)
+docker-compose exec app php artisan db:seed
+
+# Create a new migration
+docker-compose exec app php artisan make:migration create_example_table
 ```
 
-## 📧 Email Testing
-
-MailHog is included for email testing:
-
-1. Access MailHog UI: http://localhost:8025
-2. Configure Laravel to use MailHog:
-   ```env
-   MAIL_MAILER=smtp
-   MAIL_HOST=mailhog
-   MAIL_PORT=1025
-   ```
-
-## 🔍 Debugging
-
-### View Logs
+## 🛠️ Development Commands
 
 ```bash
-make logs                    # All containers
-docker-compose logs app      # PHP container only
-docker-compose logs nginx    # Nginx container only
-docker-compose logs mysql    # MySQL container only
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Execute commands in container
+docker-compose exec app php artisan list
+docker-compose exec app composer install
+docker-compose exec app npm install
+
+# Access database
+docker-compose exec mysql mysql -u laravel_user -p laravel
+
+# Clear caches
+docker-compose exec app php artisan cache:clear
+docker-compose exec app php artisan config:clear
+docker-compose exec app php artisan route:clear
 ```
 
-### Access Container Shell
+## 🔒 Security
 
-```bash
-make shell                   # PHP container
-docker-compose exec nginx sh # Nginx container
-docker-compose exec mysql bash # MySQL container
+- Environment variables are properly handled
+- Sensitive files are protected by Nginx
+- Security headers are configured
+- Database credentials are externalized
+
+## 📝 Customization
+
+### Adding New Services
+
+1. Add service to `docker-compose.yml`
+2. Update `docker-compose.dev.yml` if needed
+3. Add any necessary configuration files
+
+### Modifying PHP Extensions
+
+Edit `docker/php/Dockerfile` to add/remove PHP extensions:
+
+```dockerfile
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 ```
 
-## 🚀 Production Deployment
+### Custom Nginx Configuration
 
-For production deployment, consider:
+Modify `docker/nginx/conf.d/app.conf` for custom routing or headers.
 
-1. **Security**: Update default passwords
-2. **SSL**: Configure SSL certificates
-3. **Performance**: Optimize PHP and MySQL settings
-4. **Monitoring**: Add health checks and monitoring
-5. **Backup**: Configure database backups
+## 🐛 Troubleshooting
 
-### Production Build
+### Common Issues
 
-```bash
-make prod-build
-make prod-up
-```
+1. **Port conflicts**: Change ports in `docker-compose.yml`
+2. **Permission issues**: Run `chmod -R 755 src/storage src/bootstrap/cache`
+3. **Database connection**: Check environment variables and MySQL service status
+4. **Nginx errors**: Check logs with `docker-compose logs nginx`
 
-## 🧹 Cleanup
-
-### Remove Containers and Volumes
+### Logs
 
 ```bash
-make clean
-```
+# View all logs
+docker-compose logs
 
-### Remove Everything (Images, Containers, Volumes)
-
-```bash
-make clean-all
+# View specific service logs
+docker-compose logs app
+docker-compose logs nginx
+docker-compose logs mysql
 ```
 
 ## 🤝 Contributing
@@ -293,84 +248,14 @@ make clean-all
 
 ## 📄 License
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](LICENSE).
 
-## 🆘 Troubleshooting
+## 🙏 Acknowledgments
 
-### Common Issues
+- [Laravel](https://laravel.com/) - The PHP framework
+- [Docker](https://www.docker.com/) - Containerization platform
+- [Render](https://render.com/) - Cloud deployment platform
 
-1. **Port conflicts**: Ensure ports 80, 3306, 6379 are available
-2. **Permission issues**: Run `chmod -R 755 src/` if needed
-3. **Database connection**: Wait for MySQL to fully start (30-60 seconds)
-4. **Composer issues**: Clear composer cache with `make composer ARGS="clear-cache"`
+---
 
-### Reset Everything
-
-```bash
-make clean-all
-make setup
-```
-
-## 📚 Additional Resources
-
-- [Laravel Documentation](https://laravel.com/docs)
-- [Docker Documentation](https://docs.docker.com/)
-- [Nginx Configuration](https://nginx.org/en/docs/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
-
-## 🧪 Verifying the Project is Working
-
-1. **Check containers:**
-
-   ```bash
-   docker-compose ps
-   ```
-
-   All services should show `Up`.
-
-2. **Browser test:**
-   Open [http://localhost](http://localhost) — you should see the Laravel welcome page.
-
-3. **Artisan test:**
-
-   ```bash
-   docker-compose exec app php artisan --version
-   ```
-
-   You should see the Laravel version (e.g., `Laravel Framework 12.19.3`).
-
-4. **MailHog:**
-   Open [http://localhost:8025](http://localhost:8025) to view test emails.
-
-## 🛠️ Troubleshooting
-
-- **Nginx container keeps restarting with error:**
-
-  ```
-  invalid value "must-revalidate" in /etc/nginx/conf.d/app.conf:19
-  ```
-
-  **Solution:** Edit `docker/nginx/conf.d/app.conf` and remove `must-revalidate` from the `gzip_proxied` line. It should look like:
-
-  ```nginx
-  gzip_proxied expired no-cache no-store private auth;
-  ```
-
-  Then restart nginx:
-
-  ```bash
-  docker-compose restart nginx
-  ```
-
-- **PHP date.timezone warning:**
-  ```
-  PHP Warning: Invalid date.timezone value 'UTC ', using 'UTC' instead
-  ```
-  **Solution:** Edit `docker/php/local.ini` and remove the trailing space after `UTC`:
-  ```ini
-  date.timezone=UTC
-  ```
-  Then restart the app container:
-  ```bash
-  docker-compose restart app
-  ```
+**Happy Coding! 🎉**
